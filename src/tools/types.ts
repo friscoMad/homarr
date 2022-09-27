@@ -10,7 +10,7 @@ export interface Settings {
   secondaryColor?: MantineTheme['primaryColor'];
   primaryShade?: MantineTheme['primaryShade'];
   background?: string;
-  customCSS?: string,
+  customCSS?: string;
   appOpacity?: number;
   widgetPosition?: string;
   appCardWidth?: number;
@@ -75,6 +75,7 @@ export const ServiceTypeList = [
   'Overseerr',
   'Jellyseerr',
   'Sabnzbd',
+  'Module',
 ];
 export type ServiceType =
   | 'Other'
@@ -90,6 +91,7 @@ export type ServiceType =
   | 'Overseerr'
   | 'Jellyseerr'
   | 'Transmission'
+  | 'Module'
   | 'Sabnzbd';
 
 export function tryMatchPort(name: string | undefined, form?: any) {
@@ -179,6 +181,7 @@ export const MatchingImages: {
 export interface serviceItem {
   id: string;
   name: string;
+  size: 'sm' | 'md' | 'lg';
   type: ServiceType;
   url: string;
   icon: string;

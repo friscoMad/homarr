@@ -1,17 +1,13 @@
 import React, { useState } from 'react';
 import {
   Accordion,
-  Divider,
   Grid,
-  Paper,
   Stack,
-  Title,
   useMantineColorScheme,
 } from '@mantine/core';
 import {
   closestCenter,
   DndContext,
-  DragOverlay,
   MouseSensor,
   TouchSensor,
   useSensor,
@@ -22,11 +18,9 @@ import { useLocalStorage } from '@mantine/hooks';
 import { useTranslation } from 'next-i18next';
 import { useConfig } from '../../tools/state';
 
-import { SortableAppShelfItem, AppShelfItem } from './AppShelfItem';
-import { ModuleMenu, ModuleWrapper } from '../../modules/moduleWrapper';
+import { SortableAppShelfItem } from './AppShelfItem';
+import { ModuleWrapper } from '../../modules/moduleWrapper';
 import { UsenetModule, TorrentsModule } from '../../modules';
-import TorrentsComponent from '../../modules/torrents/TorrentsModule';
-import { UsenetComponent } from '../../modules/usenet/UsenetModule';
 
 const AppShelf = (props: any) => {
   const { config, setConfig } = useConfig();
@@ -104,126 +98,44 @@ const AppShelf = (props: any) => {
         <SortableContext items={config.services}>
           <Grid gutter="xl" align="center">
             {filtered.map((service) => (
-              <Grid.Col
-                key={service.id}
-                span={6}
-                xl={config.settings.appCardWidth || 2}
-                xs={4}
-                sm={3}
-                md={3}
-              >
+              <Grid.Col key={service.id} span="content">
                 <SortableAppShelfItem service={service} key={service.id} id={service.id} />
               </Grid.Col>
             ))}
           </Grid>
         </SortableContext>
-        <DragOverlay
-          style={{
-            // Add a shadow to the drag overlay
-            boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)',
-          }}
-        >
-          {activeId ? (
-            <AppShelfItem service={config.services.find((e) => e.id === activeId)} id={activeId} />
-          ) : null}
-        </DragOverlay>
       </DndContext>
     );
   };
 
-  if (categoryList.length > 0) {
-    const noCategory = config.services.filter(
-      (e) => e.category === undefined || e.category === null
-    );
-
-    const torrentEnabled = config.modules?.[TorrentsModule.id]?.enabled ?? false;
-    const usenetEnabled = config.modules?.[UsenetModule.id]?.enabled ?? false;
-
-    const downloadEnabled = usenetEnabled || torrentEnabled;
-    // Create an item with 0: true, 1: true, 2: true... For each category
-    return (
-      // TODO: Style accordion so that the bar is transparent to the user settings
-      <Stack>
-        <Accordion
-          variant="separated"
-          radius="lg"
-          order={2}
-          multiple
-          value={toggledCategories}
-          onChange={(state) => {
-            setToggledCategories([...state]);
-          }}
-        >
-          {categoryList.map((category, idx) => (
-            <Accordion.Item
-              style={{
-                background: `rgba(${colorScheme === 'dark' ? '32, 33, 35,' : '255, 255, 255,'} \
-              ${(config.settings.appOpacity || 100) / 100}`,
-                borderColor: `rgba(${colorScheme === 'dark' ? '32, 33, 35,' : '233, 236, 239,'} \
-              ${(config.settings.appOpacity || 100) / 100}`,
-              }}
-              key={category}
-              value={idx.toString()}
-            >
-              <Accordion.Control>{category}</Accordion.Control>
-              <Accordion.Panel>{getItems(category)}</Accordion.Panel>
-            </Accordion.Item>
-          ))}
-          {/* Return the item for all services without category */}
-          {noCategory && noCategory.length > 0 ? (
-            <Accordion.Item
-              style={{
-                background: `rgba(${colorScheme === 'dark' ? '32, 33, 35,' : '255, 255, 255,'} \
-            ${(config.settings.appOpacity || 100) / 100}`,
-                borderColor: `rgba(${colorScheme === 'dark' ? '32, 33, 35,' : '233, 236, 239,'} \
-            ${(config.settings.appOpacity || 100) / 100}`,
-              }}
-              key="Other"
-              value="Other"
-            >
-              <Accordion.Control>{t('accordions.others.text')}</Accordion.Control>
-              <Accordion.Panel>{getItems()}</Accordion.Panel>
-            </Accordion.Item>
-          ) : null}
-          {downloadEnabled ? (
-            <Accordion.Item
-              style={{
-                color: `rgba(${colorScheme === 'dark' ? '32, 33, 35,' : '255, 255, 255,'} \
-                ${(config.settings.appOpacity || 100) / 100}`,
-                background: `rgba(${colorScheme === 'dark' ? '32, 33, 35,' : '255, 255, 255,'} \
-            ${(config.settings.appOpacity || 100) / 100}`,
-                borderColor: `rgba(${colorScheme === 'dark' ? '32, 33, 35,' : '233, 236, 239,'} \
-            ${(config.settings.appOpacity || 100) / 100}`,
-              }}
-              key="Downloads"
-              value="Your downloads"
-            >
-              <Accordion.Control>{t('accordions.downloads.text')}</Accordion.Control>
-              <Accordion.Panel>
-                <Paper radius="lg">
-                  {torrentEnabled && (
-                    <>
-                      <ModuleMenu module={TorrentsModule} />
-                      <TorrentsComponent />
-                    </>
-                  )}
-                  {usenetEnabled && (
-                    <>
-                      {torrentEnabled && <Divider my="sm" />}
-                      <ModuleMenu module={UsenetModule} />
-                      <UsenetComponent />
-                    </>
-                  )}
-                </Paper>
-              </Accordion.Panel>
-            </Accordion.Item>
-          ) : null}
-        </Accordion>
-      </Stack>
-    );
-  }
   return (
     <Stack>
+      <Accordion
+        variant="separated"
+        radius="lg"
+        order={2}
+        multiple
+        value={toggledCategories}
+        onChange={(state) => {
+          setToggledCategories([...state]);
+        }}
+      >
+        {categoryList.map((category, idx) => (
+          <Accordion.Item
+            style={{
+              background: `rgba(${colorScheme === 'dark' ? '32, 33, 35,' : '255, 255, 255,'} \
+          ${(config.settings.appOpacity || 100) / 100}`,
+              borderColor: `rgba(${colorScheme === 'dark' ? '32, 33, 35,' : '233, 236, 239,'} \
+          ${(config.settings.appOpacity || 100) / 100}`,
+            }}
+            key={category}
+            value={idx.toString()}
+          >
+            <Accordion.Control>{category}</Accordion.Control>
+            <Accordion.Panel>{getItems(category)}</Accordion.Panel>
+          </Accordion.Item>
+        ))}
+      </Accordion>
       {getItems()}
       <ModuleWrapper mt="xl" module={TorrentsModule} />
       <ModuleWrapper mt="xl" module={UsenetModule} />

@@ -1,11 +1,10 @@
-import { AppShell, createStyles } from '@mantine/core';
+import { AppShell, Aside, createStyles, Navbar } from '@mantine/core';
 import { Header } from './Header';
 import { Footer } from './Footer';
-import Aside from './Aside';
-import Navbar from './Navbar';
 import { HeaderConfig } from './HeaderConfig';
 import { Background } from './Background';
 import { useConfig } from '../../tools/state';
+import Widgets from './Widgets';
 
 const useStyles = createStyles((theme) => ({
   main: {},
@@ -19,9 +18,45 @@ export default function Layout({ children, style }: any) {
   return (
     <AppShell
       fixed={false}
+      navbarOffsetBreakpoint="sm"
+      asideOffsetBreakpoint="sm"
       header={<Header />}
-      navbar={widgetPosition ? <Navbar /> : undefined}
-      aside={widgetPosition ? undefined : <Aside />}
+      navbar={
+        widgetPosition ? (
+          <Navbar
+            hidden
+            pr="md"
+            hiddenBreakpoint="sm"
+            style={{
+              border: 'none',
+              background: 'none',
+            }}
+            width={{
+              base: 'auto',
+            }}
+          >
+            <Widgets />
+          </Navbar>
+        ) : undefined
+      }
+      aside={
+        widgetPosition ? (
+          <Aside
+            hidden
+            pr="md"
+            hiddenBreakpoint="sm"
+            style={{
+              border: 'none',
+              background: 'none',
+            }}
+            width={{
+              base: 'auto',
+            }}
+          >
+            <Widgets />
+          </Aside>
+        ) : undefined
+      }
       footer={<Footer links={[]} />}
     >
       <HeaderConfig />
@@ -34,9 +69,7 @@ export default function Layout({ children, style }: any) {
       >
         {children}
       </main>
-      <style>
-        {cx(config.settings.customCSS)}
-      </style>
+      <style>{cx(config.settings.customCSS)}</style>
     </AppShell>
   );
 }

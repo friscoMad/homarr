@@ -75,6 +75,9 @@ export function AppShelfItem(props: any) {
         shadow="md"
         className={classes.item}
         style={{
+          // Use the grab cursor when hovering over the card
+          minWidth: service.size === 'sm' ? 200 : service.size === 'md' ? 300 : service.size === 'lg' ? 400 : 200,
+          cursor: hovering ? 'grab' : 'auto',
           background: `rgba(${colorScheme === 'dark' ? '37, 38, 43,' : '255, 255, 255,'} \
           ${(config.settings.appOpacity || 100) / 100}`,
           borderColor: `rgba(${colorScheme === 'dark' ? '37, 38, 43,' : '233, 236, 239,'} \

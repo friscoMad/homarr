@@ -24,6 +24,7 @@ import { IconApps } from '@tabler/icons';
 import { useTranslation } from 'next-i18next';
 import { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import * as Modules from '../../modules';
 import { useConfig } from '../../tools/state';
 import { tryMatchPort, ServiceTypeList, StatusCodes, Config } from '../../tools/types';
 import apiKeyPaths from './apiKeyPaths.json';
@@ -110,6 +111,8 @@ export function AddAppShelfItemForm(props: AddAppShelfItemFormProps) {
 
   const form = useForm({
     initialValues: {
+      /// Spread the props to the form
+      ...props,
       id: props.id ?? uuidv4(),
       type: props.type ?? 'Other',
       category: props.category ?? null,
@@ -123,6 +126,8 @@ export function AddAppShelfItemForm(props: AddAppShelfItemFormProps) {
       ping: props.ping ?? true,
       status: props.status ?? ['200'],
       newTab: props.newTab ?? true,
+      position: props.position ?? 'center',
+      size: props.size ?? 'md',
     },
     validate: {
       apiKey: () => null,
@@ -161,6 +166,8 @@ export function AddAppShelfItemForm(props: AddAppShelfItemFormProps) {
     MatchService(form.values.name, form);
     tryMatchPort(form.values.name, form);
   }, [debounced]);
+
+  const modules = Object.values(Modules).map((module) => module);
 
   // Try to set const hostname to new URL(form.values.url).hostname)
   // If it fails, set it to the form.values.url
@@ -251,43 +258,62 @@ export function AddAppShelfItemForm(props: AddAppShelfItemFormProps) {
                 placeholder="http://sonarr.example.com"
                 {...form.getInputProps('openedUrl')}
               />
-              <Select
-                label={t('modal.tabs.options.form.serviceType.label')}
-                defaultValue={t('modal.tabs.options.form.serviceType.defaultValue')}
-                placeholder={t('modal.tabs.options.form.serviceType.placeholder')}
-                required
-                searchable
-                data={ServiceTypeList}
-                {...form.getInputProps('type')}
-              />
-              <Select
-                label={t('modal.tabs.options.form.category.label')}
-                data={categories}
-                placeholder={t('modal.tabs.options.form.category.placeholder')}
-                nothingFound={t('modal.tabs.options.form.category.nothingFound')}
-                searchable
-                clearable
-                creatable
-                onCreate={(query) => {
-                  const item = { value: query, label: query };
-                  setCategories([...InitialCategories, query]);
-                  return item;
-                }}
-                getCreateLabel={(query) =>
-                  t('modal.tabs.options.form.category.createLabel', {
-                    query,
-                  })
-                }
-                {...form.getInputProps('category')}
-              />
+              <Group grow>
+                <Select
+                  label={t('modal.tabs.options.form.serviceType.label')}
+                  defaultValue={t('modal.tabs.options.form.serviceType.defaultValue')}
+                  placeholder={t('modal.tabs.options.form.serviceType.placeholder')}
+                  required
+                  searchable
+                  data={ServiceTypeList}
+                  {...form.getInputProps('type')}
+                />
+                <Select
+                  label={t('modal.tabs.options.form.category.label')}
+                  data={categories}
+                  placeholder={t('modal.tabs.options.form.category.placeholder')}
+                  nothingFound={t('modal.tabs.options.form.category.nothingFound')}
+                  searchable
+                  clearable
+                  creatable
+                  onCreate={(query) => {
+                    const item = { value: query, label: query };
+                    setCategories([...InitialCategories, query]);
+                    return item;
+                  }}
+                  getCreateLabel={(query) =>
+                    t('modal.tabs.options.form.category.createLabel', {
+                      query,
+                    })
+                  }
+                  {...form.getInputProps('category')}
+                />
+                <Select
+                  label={t('modal.tabs.options.form.size.label')}
+                  required
+                  defaultValue="md"
+                  data={['sm', 'md', 'lg']}
+                  {...form.getInputProps('size')}
+                />
+                <Select
+                  label={t('modal.tabs.options.form.position.label')}
+                  required
+                  defaultValue="center"
+                  data={['left', 'center', 'right']}
+                  {...form.getInputProps('position')}
+                />
+              </Group>
+
               <LoadingOverlay visible={isLoading} />
-              {(form.values.type === 'Sonarr' ||
-                form.values.type === 'Radarr' ||
-                form.values.type === 'Lidarr' ||
-                form.values.type === 'Overseerr' ||
-                form.values.type === 'Jellyseerr' ||
-                form.values.type === 'Readarr' ||
-                form.values.type === 'Sabnzbd') && (
+              {[
+                'Sonarr',
+                'Radarr',
+                'Lidarr',
+                'Overseerr',
+                'Jellyseerr',
+                'Readarr',
+                'Sabnzbd',
+              ].includes(form.values.type) && (
                 <>
                   <TextInput
                     required
@@ -308,7 +334,9 @@ export function AddAppShelfItemForm(props: AddAppShelfItemFormProps) {
                       target="_blank"
                       weight="bold"
                       style={{ fontStyle: 'inherit', fontSize: 'inherit' }}
-                      href={`${hostname}/${apiKeyPaths[form.values.type as keyof typeof apiKeyPaths]}`}
+                      href={`${hostname}/${
+                        apiKeyPaths[form.values.type as keyof typeof apiKeyPaths]
+                      }`}
                     >
                       {t('modal.tabs.options.form.integrations.apiKey.tip.link')}
                     </Anchor>
@@ -408,6 +436,16 @@ export function AddAppShelfItemForm(props: AddAppShelfItemFormProps) {
                     }
                   />
                 </>
+              )}
+              {form.values.type === 'Module' && (
+                <Select
+                  label={t('modal.tabs.options.form.position.label')}
+                  required
+                  defaultValue="center"
+                  // Make all modules selectable by name
+                  data={modules.map((module) => ({ value: module.id, label: module.title }))}
+                  {...form.getInputProps('position')}
+                />
               )}
             </Stack>
           </Tabs.Panel>
