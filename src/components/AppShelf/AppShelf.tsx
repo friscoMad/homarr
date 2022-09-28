@@ -9,12 +9,14 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
+
 import { arrayMove, SortableContext } from '@dnd-kit/sortable';
 import { useLocalStorage } from '@mantine/hooks';
 import { useTranslation } from 'next-i18next';
+import * as Modules from '../../modules';
 import { useConfig } from '../../tools/state';
 
-import { AppShelfItem, SortableAppShelfItem } from './AppShelfItem';
+import { AppShelfItem, SortableItem } from './AppShelfItem';
 import { ModuleWrapper } from '../../modules/moduleWrapper';
 import { UsenetModule, TorrentsModule } from '../../modules';
 
@@ -77,6 +79,12 @@ const AppShelf = (props: any) => {
   const getItems = (filter?: string) => {
     // If filter is not set, return all the services without a category or a null category
     let filtered = config.services;
+    const modules = Object.values(Modules).map((module) => module);
+
+    // Get all the service with the "Module" type and the "center" position
+    const enabledModules = config.services.filter(
+      (s) => s.type === 'Module' && s.position === 'center'
+    );
     if (!filter) {
       filtered = config.services.filter((e) => !e.category || e.category === null);
     }
@@ -97,9 +105,27 @@ const AppShelf = (props: any) => {
           <Grid gutter="lg" align="center">
             {filtered.map((service) => (
               <Grid.Col key={service.id} span="content">
-                <SortableAppShelfItem service={service} key={service.id} id={service.id} />
+                <SortableItem service={service} key={service.id} id={service.id}>
+                  <AppShelfItem service={service} />
+                </SortableItem>
               </Grid.Col>
             ))}
+            {
+              // Get the right module for each enabledModules, maching the id
+              enabledModules.map((module) => {
+                const Module = modules.find((m) => m.id === module.id);
+                if (!Module) {
+                  return null;
+                }
+                return (
+                  <Grid.Col key={module.id} span="content">
+                    <SortableItem service={module} key={module.id} id={module.id}>
+                      <ModuleWrapper isShown key={module.id} module={Module} />
+                    </SortableItem>
+                  </Grid.Col>
+                );
+              })
+            }
           </Grid>
         </SortableContext>
         <DragOverlay

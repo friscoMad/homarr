@@ -31,7 +31,7 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-export function SortableAppShelfItem(props: any) {
+export function SortableItem(props: any) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
     id: props.id,
   });
@@ -43,7 +43,7 @@ export function SortableAppShelfItem(props: any) {
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <AppShelfItem service={props.service} />
+      {props.children}
     </div>
   );
 }
