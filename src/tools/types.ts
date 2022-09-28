@@ -183,12 +183,14 @@ export interface serviceItem {
   name: string;
   size: 'sm' | 'md' | 'lg';
   type: ServiceType;
+  position: 'left' | 'right' | 'center';
   url: string;
   icon: string;
   category?: string;
   apiKey?: string;
   password?: string;
   username?: string;
+  module? : string;
   openedUrl?: string;
   newTab?: boolean;
   ping?: boolean;
