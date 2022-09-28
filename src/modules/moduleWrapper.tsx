@@ -146,9 +146,8 @@ export function ModuleWrapper(props: any) {
   const { colorScheme } = useMantineColorScheme();
   const { config, setConfig } = useConfig();
   const enabledModules = config.modules ?? {};
-  // Remove 'Module' from enabled modules titles
-  const isShown = enabledModules[module.id]?.enabled ?? false;
-  //TODO: fix the hover problem
+  const isShown = props.isShown ?? enabledModules[module.id]?.enabled ?? false;
+
   const [hovering, setHovering] = useState(false);
   const { t } = useTranslation('modules');
 

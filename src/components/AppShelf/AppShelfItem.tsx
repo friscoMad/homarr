@@ -76,7 +76,14 @@ export function AppShelfItem(props: any) {
         className={classes.item}
         style={{
           // Use the grab cursor when hovering over the card
-          minWidth: service.size === 'sm' ? 200 : service.size === 'md' ? 300 : service.size === 'lg' ? 400 : 200,
+          minWidth:
+            service.size === 'sm'
+              ? 150
+              : service.size === 'md'
+              ? 300
+              : service.size === 'lg'
+              ? 400
+              : 150,
           cursor: hovering ? 'grab' : 'auto',
           background: `rgba(${colorScheme === 'dark' ? '37, 38, 43,' : '255, 255, 255,'} \
           ${(config.settings.appOpacity || 100) / 100}`,
@@ -114,8 +121,8 @@ export function AppShelfItem(props: any) {
               ratio={3 / 5}
               m="xl"
               style={{
-                width: 150,
-                height: 90,
+                width: 200 * (config.settings.appCardWidth ?? 0.75),
+                height: 100 * (config.settings.appCardWidth ?? 0.75),
               }}
             >
               <motion.i
@@ -129,8 +136,8 @@ export function AppShelfItem(props: any) {
                 >
                   <Image
                     styles={{ root: { cursor: 'pointer' } }}
-                    width={80}
-                    height={80}
+                    width={80 * ((config.settings.appCardWidth ?? 1) * 1.2)}
+                    height={80 * ((config.settings.appCardWidth ?? 1) * 1.2)}
                     src={service.icon}
                     fit="contain"
                   />

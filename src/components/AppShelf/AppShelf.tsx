@@ -1,13 +1,9 @@
 import React, { useState } from 'react';
-import {
-  Accordion,
-  Grid,
-  Stack,
-  useMantineColorScheme,
-} from '@mantine/core';
+import { Accordion, Grid, Stack, useMantineColorScheme } from '@mantine/core';
 import {
   closestCenter,
   DndContext,
+  DragOverlay,
   MouseSensor,
   TouchSensor,
   useSensor,
@@ -18,7 +14,7 @@ import { useLocalStorage } from '@mantine/hooks';
 import { useTranslation } from 'next-i18next';
 import { useConfig } from '../../tools/state';
 
-import { SortableAppShelfItem } from './AppShelfItem';
+import { AppShelfItem, SortableAppShelfItem } from './AppShelfItem';
 import { ModuleWrapper } from '../../modules/moduleWrapper';
 import { UsenetModule, TorrentsModule } from '../../modules';
 
@@ -87,6 +83,8 @@ const AppShelf = (props: any) => {
     if (filter) {
       filtered = config.services.filter((e) => e.category === filter);
     }
+    // Remove the services that have the "Module" type
+    filtered = filtered.filter((e) => e.type !== 'Module');
 
     return (
       <DndContext
@@ -96,7 +94,7 @@ const AppShelf = (props: any) => {
         onDragEnd={handleDragEnd}
       >
         <SortableContext items={config.services}>
-          <Grid gutter="xl" align="center">
+          <Grid gutter="lg" align="center">
             {filtered.map((service) => (
               <Grid.Col key={service.id} span="content">
                 <SortableAppShelfItem service={service} key={service.id} id={service.id} />
@@ -104,6 +102,16 @@ const AppShelf = (props: any) => {
             ))}
           </Grid>
         </SortableContext>
+        <DragOverlay
+          style={{
+            // Add a shadow to the drag overlay
+            boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)',
+          }}
+        >
+          {activeId ? (
+            <AppShelfItem service={config.services.find((e) => e.id === activeId)} id={activeId} />
+          ) : null}
+        </DragOverlay>
       </DndContext>
     );
   };

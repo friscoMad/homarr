@@ -1,7 +1,16 @@
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { PolymorphicModuleDisplay } from '../components/Services/PolymorphicModuleDisplay';
 import { ServiceShelf } from '../components/Services/ServicesDisplayShelf';
 
-export default function TestAppshelf(props: any) {
+export default function TestAppShelf() {
+  return (
+    <>
+      <PolymorphicModuleDisplay enabledModules={['date', 'weather']} />;
+    </>
+  );
+}
+
+function TestAppshelf(props: any) {
   return (
     <ServiceShelf
       services={[

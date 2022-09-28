@@ -4,7 +4,7 @@ import { Footer } from './Footer';
 import { HeaderConfig } from './HeaderConfig';
 import { Background } from './Background';
 import { useConfig } from '../../tools/state';
-import Widgets from './Widgets';
+import { PolymorphicModuleDisplay } from '../Services/PolymorphicModuleDisplay';
 
 const useStyles = createStyles((theme) => ({
   main: {},
@@ -13,7 +13,14 @@ const useStyles = createStyles((theme) => ({
 export default function Layout({ children, style }: any) {
   const { classes, cx } = useStyles();
   const { config } = useConfig();
-  const widgetPosition = config?.settings?.widgetPosition === 'left';
+  // Get all services of type that are on the "right" position, return their "module" id
+  const rightServices = config.services
+    .filter((service) => service.type === 'Module' && service.position === 'right')
+    .map((service) => service.module);
+  // Get all services of type that are on the "left" position
+  const leftServices = config.services
+    .filter((service) => service.type === 'Module' && service.position === 'left')
+    .map((service) => service.module);
 
   return (
     <AppShell
@@ -22,40 +29,36 @@ export default function Layout({ children, style }: any) {
       asideOffsetBreakpoint="sm"
       header={<Header />}
       navbar={
-        widgetPosition ? (
-          <Navbar
-            hidden
-            pr="md"
-            hiddenBreakpoint="sm"
-            style={{
-              border: 'none',
-              background: 'none',
-            }}
-            width={{
-              base: 'auto',
-            }}
-          >
-            <Widgets />
-          </Navbar>
-        ) : undefined
+        <Navbar
+          hidden
+          pl="xs"
+          hiddenBreakpoint="sm"
+          style={{
+            border: 'none',
+            background: 'none',
+          }}
+          width={{
+            base: 'auto',
+          }}
+        >
+          <PolymorphicModuleDisplay enabledModules={leftServices} />
+        </Navbar>
       }
       aside={
-        widgetPosition ? (
-          <Aside
-            hidden
-            pr="md"
-            hiddenBreakpoint="sm"
-            style={{
-              border: 'none',
-              background: 'none',
-            }}
-            width={{
-              base: 'auto',
-            }}
-          >
-            <Widgets />
-          </Aside>
-        ) : undefined
+        <Aside
+          hidden
+          pr="xs"
+          hiddenBreakpoint="sm"
+          style={{
+            border: 'none',
+            background: 'none',
+          }}
+          width={{
+            base: 'auto',
+          }}
+        >
+          <PolymorphicModuleDisplay enabledModules={rightServices} />
+        </Aside>
       }
       footer={<Footer links={[]} />}
     >
