@@ -112,7 +112,6 @@ export function AddAppShelfItemForm(props: AddAppShelfItemFormProps) {
   const form = useForm({
     initialValues: {
       /// Spread the props to the form
-      ...props,
       id: props.id ?? uuidv4(),
       type: props.type ?? 'Other',
       category: props.category ?? null,
@@ -128,6 +127,7 @@ export function AddAppShelfItemForm(props: AddAppShelfItemFormProps) {
       newTab: props.newTab ?? true,
       position: props.position ?? 'center',
       size: props.size ?? 'md',
+      module: props.module ?? undefined,
     },
     validate: {
       apiKey: () => null,
@@ -439,12 +439,11 @@ export function AddAppShelfItemForm(props: AddAppShelfItemFormProps) {
               )}
               {form.values.type === 'Module' && (
                 <Select
-                  label={t('modal.tabs.options.form.position.label')}
+                  label={t('modal.tabs.options.form.module.label')}
                   required
-                  defaultValue="center"
                   // Make all modules selectable by name
                   data={modules.map((module) => ({ value: module.id, label: module.title }))}
-                  {...form.getInputProps('position')}
+                  {...form.getInputProps('module')}
                 />
               )}
             </Stack>
