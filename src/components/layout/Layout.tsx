@@ -29,36 +29,40 @@ export default function Layout({ children, style }: any) {
       asideOffsetBreakpoint="sm"
       header={<Header />}
       navbar={
-        <Navbar
-          hidden
-          pl="xs"
-          hiddenBreakpoint="sm"
-          style={{
-            border: 'none',
-            background: 'none',
-          }}
-          width={{
-            base: 'auto',
-          }}
-        >
-          <PolymorphicModuleDisplay enabledModules={leftServices} />
-        </Navbar>
+        leftServices.length > 0 ? (
+          <Navbar
+            hidden
+            pl="xs"
+            hiddenBreakpoint="sm"
+            style={{
+              border: 'none',
+              background: 'none',
+            }}
+            width={{
+              base: 'auto',
+            }}
+          >
+            <PolymorphicModuleDisplay enabledModules={leftServices} />
+          </Navbar>
+        ) : undefined
       }
       aside={
-        <Aside
-          hidden
-          pr="xs"
-          hiddenBreakpoint="sm"
-          style={{
-            border: 'none',
-            background: 'none',
-          }}
-          width={{
-            base: 'auto',
-          }}
-        >
-          <PolymorphicModuleDisplay enabledModules={rightServices} />
-        </Aside>
+        rightServices.length > 0 ? (
+          <Aside
+            hidden
+            pr="xs"
+            hiddenBreakpoint="sm"
+            style={{
+              border: 'none',
+              background: 'none',
+            }}
+            width={{
+              base: 'auto',
+            }}
+          >
+            <PolymorphicModuleDisplay enabledModules={rightServices} />
+          </Aside>
+        ) : undefined
       }
       footer={<Footer links={[]} />}
     >
