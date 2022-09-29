@@ -13,6 +13,7 @@ import {
   Tooltip,
   useMantineTheme,
 } from '@mantine/core';
+import { useElementSize } from '@mantine/hooks';
 import { IconAlertCircle, IconPlayerPause, IconPlayerPlay } from '@tabler/icons';
 import { AxiosError } from 'axios';
 import dayjs from 'dayjs';
@@ -33,6 +34,7 @@ const PAGE_SIZE = 10;
 export const UsenetQueueList: FunctionComponent<UsenetQueueListProps> = ({ serviceId }) => {
   const theme = useMantineTheme();
   const { t } = useTranslation('modules/usenet');
+  const { ref, width, height } = useElementSize();
 
   const [page, setPage] = useState(1);
   const { data, isLoading, isError, error } = useGetUsenetDownloads({
@@ -81,36 +83,39 @@ export const UsenetQueueList: FunctionComponent<UsenetQueueListProps> = ({ servi
 
   return (
     <>
-      <Table highlightOnHover style={{ tableLayout: 'fixed' }}>
+      <Table ref={ref} highlightOnHover style={{ tableLayout: 'fixed' }}>
         <thead>
           <tr>
-            <th style={{ width: 50 }} />
-            <th style={{ width: '75%' }}>{t('queue.header.name')}</th>
-            <th style={{ width: 100 }}>{t('queue.header.size')}</th>
-            <th style={{ width: 100 }}>{t('queue.header.eta')}</th>
-            <th style={{ width: 200 }}>{t('queue.header.progress')}</th>
+            {width > 400 && <th style={{ width: 50 }} />}
+            <th style={{ width: width > 400 ? '75%' : 100 }}>{t('queue.header.name')}</th>
+            {width > 400 && <th style={{ width: 100 }}>{t('queue.header.size')}</th>}
+            {width > 400 && <th style={{ width: 100 }}>{t('queue.header.eta')}</th>}
+            <th style={{ width: width > 400 ? 200 : 50 }}>{t('queue.header.progress')}</th>
           </tr>
         </thead>
         <tbody>
           {data.items.map((nzb) => (
             <tr key={nzb.id}>
+              {width > 400 && (
+                <td>
+                  {nzb.state === 'paused' ? (
+                    // Hide if width > 400
+                    <Tooltip label="NOT IMPLEMENTED" withinPortal>
+                      <ActionIcon color="gray" variant="subtle" radius="xl" size="sm">
+                        <IconPlayerPlay size="16" />
+                      </ActionIcon>
+                    </Tooltip>
+                  ) : (
+                    <Tooltip label="NOT IMPLEMENTED" withinPortal>
+                      <ActionIcon color="primary" variant="subtle" radius="xl" size="sm">
+                        <IconPlayerPause size="16" />
+                      </ActionIcon>
+                    </Tooltip>
+                  )}
+                </td>
+              )}
               <td>
-                {nzb.state === 'paused' ? (
-                  <Tooltip label="NOT IMPLEMENTED">
-                    <ActionIcon color="gray" variant="subtle" radius="xl" size="sm">
-                      <IconPlayerPlay size="16" />
-                    </ActionIcon>
-                  </Tooltip>
-                ) : (
-                  <Tooltip label="NOT IMPLEMENTED">
-                    <ActionIcon color="primary" variant="subtle" radius="xl" size="sm">
-                      <IconPlayerPause size="16" />
-                    </ActionIcon>
-                  </Tooltip>
-                )}
-              </td>
-              <td>
-                <Tooltip position="top" label={nzb.name}>
+                <Tooltip position="top" label={nzb.name} withinPortal>
                   <Text
                     style={{
                       whiteSpace: 'nowrap',
@@ -124,29 +129,38 @@ export const UsenetQueueList: FunctionComponent<UsenetQueueListProps> = ({ servi
                   </Text>
                 </Tooltip>
               </td>
-              <td>
-                <Text size="xs">{humanFileSize(nzb.size)}</Text>
-              </td>
-              <td>
-                {nzb.eta <= 0 ? (
-                  <Text size="xs" color="dimmed">
-                    {t('queue.paused')}
-                  </Text>
-                ) : (
-                  <Text size="xs">{dayjs.duration(nzb.eta, 's').format('H:mm:ss')}</Text>
-                )}
-              </td>
+              {width > 400 && (
+                <td>
+                  <Text size="xs">{humanFileSize(nzb.size)}</Text>
+                </td>
+              )}
+              {width > 400 && (
+                <td>
+                  {nzb.eta <= 0 ? (
+                    <Text size="xs" color="dimmed">
+                      {t('queue.paused')}
+                    </Text>
+                  ) : (
+                    <Text size="xs">{dayjs.duration(nzb.eta, 's').format('H:mm:ss')}</Text>
+                  )}
+                </td>
+              )}
               <td style={{ display: 'flex', alignItems: 'center' }}>
                 <Text mr="sm" style={{ whiteSpace: 'nowrap' }}>
                   {nzb.progress.toFixed(1)}%
                 </Text>
-                <Progress
-                  radius="lg"
-                  color={nzb.eta > 0 ? theme.primaryColor : 'lightgrey'}
-                  value={nzb.progress}
-                  size="lg"
-                  style={{ width: '100%' }}
-                />
+                {
+                  // Hide if width < 400
+                  width > 400 && (
+                    <Progress
+                      radius="lg"
+                      color={nzb.eta > 0 ? theme.primaryColor : 'lightgrey'}
+                      value={nzb.progress}
+                      size="lg"
+                      style={{ width: '100%' }}
+                    />
+                  )
+                }
               </td>
             </tr>
           ))}
